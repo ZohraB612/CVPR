@@ -4,3 +4,4 @@
 # Ignore the cvpr and MSRC_ObjCategImageDatabase_v2 directories
 cvpr/
 MSRC_ObjCategImageDatabase_v2/
+results/
