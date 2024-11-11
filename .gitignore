@@ -1,3 +1,6 @@
 # Ignore all .npy and .npz files
 *.npy
 *.npz
+# Ignore the cvpr and MSRC_ObjCategImageDatabase_v2 directories
+cvpr/
+MSRC_ObjCategImageDatabase_v2/
