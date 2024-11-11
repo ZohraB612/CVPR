@@ -1,0 +1,48 @@
+Test Queries Analysis
+====================
+
+
+Query: building
+True Label: 3
+Predicted: 3
+Confidence: 0.9900
+
+Top-3 Predictions:
+Class 3: 0.9900
+Class 19: 0.0038
+Class 17: 0.0026
+
+Query: face
+True Label: 17
+Predicted: 17
+Confidence: 0.9990
+
+Top-3 Predictions:
+Class 17: 0.9990
+Class 20: 0.0004
+Class 19: 0.0003
+
+Query: sheep
+True Label: 6
+Predicted: 6
+Confidence: 0.5590
+
+Top-3 Predictions:
+Class 6: 0.5590
+Class 13: 0.4354
+Class 19: 0.0054
+
+Query: street
+True Label: 9
+Predicted: 9
+Confidence: 0.9919
+
+Top-3 Predictions:
+Class 9: 0.9919
+Class 1: 0.0057
+Class 5: 0.0008
+
+Overall Statistics
+=================
+Accuracy on test queries: 1.000
+Average confidence for correct predictions: 0.885

@@ -1,0 +1,4 @@
+Classification Results
+Feature type: spatial_hist
+Best cross-validation score: 0.5255
+Best parameters: {'C': 1, 'gamma': 'scale', 'kernel': 'linear'}

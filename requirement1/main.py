@@ -20,7 +20,8 @@ from config.settings import (
     IMAGE_PATH, 
     TEST_QUERIES, 
     CONFIGS,
-    SPATIAL_CONFIGS
+    SPATIAL_CONFIGS,
+    BASE_PATH
 )
 from src.histogram import compute_global_histogram, euclidean_distance
 from src.evaluation import compute_pr_curve
@@ -29,6 +30,7 @@ from src.utils import check_requirements, get_image_class, create_results_direct
 from src.spatial_histogram import compute_spatial_histogram
 from src.pca_retrieval import PCARetrieval
 from src.analysis import compare_pca_results
+from src.bovw_retrieval import BoVWRetrieval
 
 def parse_args():
     """Parse command line arguments."""
@@ -41,6 +43,10 @@ def parse_args():
                        help='Number of PCA components')
     parser.add_argument('--compare_pca', action='store_true',
                        help='Compare PCA results')
+    parser.add_argument('--bovw', action='store_true',
+                       help='Run BoVW retrieval experiment')
+    parser.add_argument('--codebook_size', type=int, default=1000,
+                       help='Size of BoVW codebook')
     return parser.parse_args()
 
 def process_configuration(config):
@@ -123,7 +129,7 @@ def process_query(query_path, features, config, results_dir):
             distances.append((dist, files[i]))
         
         # Sort distances
-        distances_sorted = sorted(distances)  # Sort based on first element (distance)
+        distances_sorted = sorted(distances)
         
         # Get query class
         query_class = get_image_class(query_path)
@@ -143,57 +149,88 @@ def main():
     args = parse_args()
     
     # Check requirements
-    if not check_requirements():
-        sys.exit(1)
+    check_requirements()
     
     print("Starting image retrieval system...")
-    print(f"Using dataset: {IMAGE_FOLDER}")
+    print(f"Using dataset: {IMAGE_FOLDER}\n")
     
-    if args.compare_pca:
-        compare_pca_results()
-        return
-    
-    # Run appropriate experiment based on arguments
-    if args.pca_experiment:
-        pca = PCARetrieval(n_components=args.pca_components)
-        pca.run_experiment(
-            image_path=IMAGE_PATH,
-            results_base_dir='results'
-        )
-    else:
-        if args.spatial_grid:
-            configs_to_run = SPATIAL_CONFIGS
-            print("Running spatial grid experiments")
-        else:
-            configs_to_run = CONFIGS
-            print("Running standard histogram experiments")
+    if args.bovw:
+        print("\nRunning BoVW retrieval experiment...")
+        bovw_config = {
+            'codebook_size': args.codebook_size,
+            'detector': 'sift'
+        }
         
-        print(f"Testing {len(configs_to_run)} different configurations")
+        bovw = BoVWRetrieval(bovw_config)
         
-        # Process each configuration
-        for config in configs_to_run:
-            print(f"\nProcessing configuration: R{config['r']}G{config['g']}B{config['b']}")
+        # Build codebook and compute features
+        image_files = [f for f in os.listdir(IMAGE_PATH) if f.endswith('.bmp')]
+        image_paths = [os.path.join(IMAGE_PATH, f) for f in image_files]
+        
+        try:
+            bovw.build_codebook(image_paths, args.codebook_size)
+            bovw.compute_bovw_features(image_paths)
             
-            # Process configuration
-            features = process_configuration(config)
-            
-            # Create results directory
+            # Process queries
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            results_dir = create_results_directory(config, timestamp)
+            results_dir = os.path.join('results', f'bovw_{args.codebook_size}_{timestamp}')
+            os.makedirs(results_dir, exist_ok=True)
             
-            # Process test queries
-            print("\nProcessing test queries...")
             for query_name, query_path in TEST_QUERIES.items():
                 print(f"Processing query: {query_name}")
-                try:
-                    process_query(query_path, features, config, results_dir)
-                except Exception as e:
-                    print(f"Error processing query {query_path}: {str(e)}")
-                    continue
+                bovw.process_query(query_path, results_dir)
             
-            print(f"Results saved to: {results_dir}")
+            print(f"\nResults saved to: {results_dir}")
+            
+        except KeyboardInterrupt:
+            print("\nProcess interrupted by user")
+            return
+        except Exception as e:
+            print(f"\nError in BoVW processing: {str(e)}")
+            return
     
-    print("\nProcessing complete!")
+    elif args.pca_experiment:
+        print("\nRunning PCA experiment...")
+        pca = PCARetrieval(CONFIGS['default'], args.pca_components)
+        
+        # Process all images
+        image_files = [f for f in os.listdir(IMAGE_PATH) if f.endswith('.bmp')]
+        image_paths = [os.path.join(IMAGE_PATH, f) for f in image_files]
+        pca.process_images(image_paths)
+        
+        # Process queries
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        results_dir = create_results_directory(f'pca_{args.pca_components}_{timestamp}')
+        
+        for query_name, query_path in TEST_QUERIES.items():
+            print(f"Processing query: {query_name}")
+            pca.process_query(query_path, results_dir)
+        
+        print(f"\nResults saved to: {results_dir}")
+        
+        if args.compare_pca:
+            compare_pca_results(results_dir)
+    
+    else:
+        configs = SPATIAL_CONFIGS if args.spatial_grid else CONFIGS
+        print("Running histogram experiments")
+        print(f"Testing {len(configs)} different configurations\n")
+        
+        for config_name, config in configs.items():
+            print(f"Processing configuration: {config_name}")
+            
+            # Process all images
+            features = process_configuration(config)
+            
+            # Process queries
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            results_dir = create_results_directory(f'{config_name}_{timestamp}')
+            
+            for query_name, query_path in TEST_QUERIES.items():
+                print(f"Processing query: {query_name}")
+                process_query(query_path, features, config, results_dir)
+            
+            print(f"Results saved to: {results_dir}\n")
 
 if __name__ == "__main__":
     main()

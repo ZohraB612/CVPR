@@ -1,0 +1,214 @@
+(cvpr) zohrab@DESKTOP-4QCVS31:~/CVPR/requirement1$ python run_classification.py --classifier cnn --model_name resnet18
+Starting image classification system...
+Using dataset: Images
+
+
+Running CNN classification with resnet18...
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet18_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet18_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /home/zohrab/.cache/torch/hub/checkpoints/resnet18-f37072fd.pth
+100%|██████████████████████████████████████████████████████████████████████████████████████████████| 44.7M/44.7M [00:01<00:00, 38.5MB/s]
+Epoch 1/20: 100%|████████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00,  8.81it/s, loss=1.22]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 1: Val Accuracy = 0.3445
+Epoch 2/20: 100%|███████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00, 14.40it/s, loss=0.472]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 2: Val Accuracy = 0.4706
+Epoch 3/20: 100%|███████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00, 14.91it/s, loss=0.449]
+Epoch 3: Val Accuracy = 0.6891
+Epoch 4/20: 100%|███████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00, 14.60it/s, loss=0.289]
+Epoch 4: Val Accuracy = 0.6975
+Epoch 5/20: 100%|███████████████████████████████████████████████████████████████████████████| 15/15 [00:00<00:00, 15.15it/s, loss=0.247]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 5: Val Accuracy = 0.6218
+Epoch 6/20: 100%|███████████████████████████████████████████████████████████████████████████| 15/15 [00:00<00:00, 15.04it/s, loss=0.231]
+Epoch 6: Val Accuracy = 0.6807
+Epoch 7/20: 100%|███████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00, 14.98it/s, loss=0.274]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 7: Val Accuracy = 0.6134
+Epoch 8/20: 100%|███████████████████████████████████████████████████████████████████████████| 15/15 [00:00<00:00, 15.18it/s, loss=0.233]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 8: Val Accuracy = 0.6303
+Epoch 9/20: 100%|███████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00, 14.99it/s, loss=0.166]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 9: Val Accuracy = 0.7563
+Epoch 10/20: 100%|██████████████████████████████████████████████████████████████████████████| 15/15 [00:00<00:00, 15.11it/s, loss=0.181]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 10: Val Accuracy = 0.7059
+Epoch 11/20: 100%|██████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00, 14.87it/s, loss=0.283]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 11: Val Accuracy = 0.6807
+Epoch 12/20: 100%|███████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00, 14.81it/s, loss=0.26]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 12: Val Accuracy = 0.5966
+Epoch 13/20: 100%|██████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00, 14.82it/s, loss=0.152]
+Epoch 13: Val Accuracy = 0.6387
+Epoch 14/20: 100%|██████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00, 14.91it/s, loss=0.143]
+Epoch 14: Val Accuracy = 0.8151
+Epoch 15/20: 100%|██████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00, 14.87it/s, loss=0.154]
+Epoch 15: Val Accuracy = 0.7983
+Epoch 16/20: 100%|█████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00, 14.95it/s, loss=0.0744]
+Epoch 16: Val Accuracy = 0.8067
+Epoch 17/20: 100%|█████████████████████████████████████████████████████████████████████████| 15/15 [00:00<00:00, 15.05it/s, loss=0.0389]
+Epoch 17: Val Accuracy = 0.8655
+Epoch 18/20: 100%|█████████████████████████████████████████████████████████████████████████| 15/15 [00:00<00:00, 15.07it/s, loss=0.0535]
+Epoch 18: Val Accuracy = 0.8487
+Epoch 19/20: 100%|██████████████████████████████████████████████████████████████████████████| 15/15 [00:01<00:00, 14.98it/s, loss=0.048]
+Epoch 19: Val Accuracy = 0.7479
+Epoch 20/20: 100%|███████████████████████████████████████████████████████████████████████████| 15/15 [00:00<00:00, 15.15it/s, loss=0.12]
+Epoch 20: Val Accuracy = 0.8235
+
+Classification experiments completed!
+Results saved in: results/classification_20241111_023857
+
+-------------------------------------
+
+(cvpr) zohrab@DESKTOP-4QCVS31:~/CVPR/requirement1$ python run_classification.py --classifier cnn --model_name resnet18
+Starting image classification system...
+Using dataset: Images
+
+
+Running CNN classification with resnet18...
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet18_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet18_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/torch/optim/lr_scheduler.py:62: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.
+  warnings.warn(
+Epoch 1/20: 100%|██████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  4.50it/s, loss=1.57]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 1: Val Accuracy = 0.2017
+Epoch 2/20: 100%|█████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  5.96it/s, loss=0.748]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 2: Val Accuracy = 0.5294
+Epoch 3/20: 100%|█████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.25it/s, loss=0.661]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 3: Val Accuracy = 0.4706
+Epoch 4/20: 100%|█████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.40it/s, loss=0.515]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 4: Val Accuracy = 0.4286
+Epoch 5/20: 100%|█████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.29it/s, loss=0.414]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 5: Val Accuracy = 0.5714
+Epoch 6/20: 100%|█████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  5.89it/s, loss=0.321]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 6: Val Accuracy = 0.6807
+Epoch 7/20: 100%|█████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.23it/s, loss=0.311]
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/home/zohrab/CVPR/cvpr/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+Epoch 7: Val Accuracy = 0.6807
+Epoch 8/20: 100%|██████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.33it/s, loss=0.32]
+Epoch 8: Val Accuracy = 0.5546
+Epoch 9/20: 100%|█████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.35it/s, loss=0.256]
+Epoch 9: Val Accuracy = 0.7563
+Epoch 10/20: 100%|████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.02it/s, loss=0.184]
+Epoch 10: Val Accuracy = 0.6975
+Epoch 11/20: 100%|████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.21it/s, loss=0.173]
+Epoch 11: Val Accuracy = 0.7059
+Epoch 12/20: 100%|████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.20it/s, loss=0.149]
+Epoch 12: Val Accuracy = 0.7479
+Epoch 13/20: 100%|████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.31it/s, loss=0.142]
+Epoch 13: Val Accuracy = 0.7311
+Epoch 14/20: 100%|████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.42it/s, loss=0.165]
+Epoch 14: Val Accuracy = 0.7983
+Epoch 15/20: 100%|███████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.11it/s, loss=0.0818]
+Epoch 15: Val Accuracy = 0.8319
+Epoch 16/20: 100%|████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.22it/s, loss=0.111]
+Epoch 16: Val Accuracy = 0.8487
+Epoch 17/20: 100%|███████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.19it/s, loss=0.0561]
+Epoch 17: Val Accuracy = 0.8319
+Epoch 18/20: 100%|███████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.11it/s, loss=0.0728]
+Epoch 18: Val Accuracy = 0.8319
+Epoch 19/20: 100%|███████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  5.51it/s, loss=0.0503]
+Epoch 19: Val Accuracy = 0.8487
+Epoch 20/20: 100%|███████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  6.10it/s, loss=0.0373]
+Epoch 20: Val Accuracy = 0.8487
+
+Generating visualization of model predictions...
+
+Generating visualizations...
+Extracting features: 100%|████████████████████████████████████████████████████████████████████████████| 591/591 [00:06<00:00, 96.82it/s]
+
+Classification experiments completed!
+Results saved in: results/classification_20241111_024452

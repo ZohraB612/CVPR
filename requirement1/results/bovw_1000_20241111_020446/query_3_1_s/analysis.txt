@@ -1,0 +1,16 @@
+Analysis Report for Query Image: 3_1_s.bmp
+Query Class: 3
+
+BoVW Configuration:
+Codebook size: 1000
+Feature detector: sift
+
+Retrieval Performance:
+Average Precision: 0.0688
+Precision@10: 0.300
+Precision@20: 0.150
+
+Correct retrievals in top 20: 3
+
+SIFT Feature Statistics:
+Number of SIFT features in query: 469
