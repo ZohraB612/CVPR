@@ -1,0 +1,37 @@
+Analysis Report for Query Image: 3_1_s.bmp
+Query Class: 3
+
+Color Quantization Configuration:
+R: 8 bins
+G: 8 bins
+B: 4 bins
+Total bins: 256
+
+Retrieval Performance:
+Average Precision: 0.0800
+Precision@10: 0.100
+Precision@20: 0.050
+
+Retrieval Distribution Analysis (Top 20):
+Correct retrievals (same class): 1
+
+Most retrieved classes:
+- 4: 4 instances
+- 2: 3 instances
+- 14: 2 instances
+
+Distance Analysis:
+Minimum distance: 0.0000
+Maximum distance: 0.0888
+
+Top 10 Retrieved Images:
+1. 3_1_s.bmp - 3 ✓ (distance: 0.0000)
+2. 2_10_s.bmp - 2 ✗ (distance: 0.0438)
+3. 18_4_s.bmp - 18 ✗ (distance: 0.0443)
+4. 4_8_s.bmp - 4 ✗ (distance: 0.0451)
+5. 5_16_s.bmp - 5 ✗ (distance: 0.0451)
+6. 4_10_s.bmp - 4 ✗ (distance: 0.0454)
+7. 4_11_s.bmp - 4 ✗ (distance: 0.0458)
+8. 14_5_s.bmp - 14 ✗ (distance: 0.0460)
+9. 14_4_s.bmp - 14 ✗ (distance: 0.0467)
+10. 8_27_s.bmp - 8 ✗ (distance: 0.0473)

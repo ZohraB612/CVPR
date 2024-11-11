@@ -2,15 +2,8 @@
 Main execution script for image retrieval system using global color histograms.
 Implements Requirement 1 of the EEE3032 Computer Vision coursework.
 
-This script:
-1. Processes images with different color quantization levels
-2. Computes and caches global color histograms
-3. Performs image retrieval using Euclidean distance
-4. Generates comprehensive visualizations and analysis
-
 Author: Zohra Bouchamaoui
 Student ID: 6848526
-Module: EEE3032 Computer Vision and Pattern Recognition
 """
 
 import sys
@@ -19,155 +12,186 @@ from tqdm import tqdm
 import numpy as np
 import cv2
 import os
-from src.histogram import compute_global_histogram  
+import argparse
 
 # Local imports
 from config.settings import (
     IMAGE_FOLDER, 
     IMAGE_PATH, 
     TEST_QUERIES, 
-    CONFIGS
+    CONFIGS,
+    SPATIAL_CONFIGS
 )
 from src.histogram import compute_global_histogram, euclidean_distance
 from src.evaluation import compute_pr_curve
 from src.visualisation import save_experiment_results
 from src.utils import check_requirements, get_image_class, create_results_directory
+from src.spatial_histogram import compute_spatial_histogram
+from src.pca_retrieval import PCARetrieval
+from src.analysis import compare_pca_results
+
+def parse_args():
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(description='Image Retrieval System')
+    parser.add_argument('--spatial_grid', action='store_true',
+                       help='Use spatial grid features')
+    parser.add_argument('--pca_experiment', action='store_true',
+                       help='Run PCA experiment')
+    parser.add_argument('--pca_components', type=int, default=32,
+                       help='Number of PCA components')
+    parser.add_argument('--compare_pca', action='store_true',
+                       help='Compare PCA results')
+    return parser.parse_args()
 
 def process_configuration(config):
-    """
-    Process a single quantization configuration.
+    """Process a single quantization configuration."""
+    # Create cache filename
+    cache_file = f"cache_{config['name']}.npy"
     
-    Args:
-        config: Dictionary containing r,g,b bin counts and name
-        
-    Returns:
-        tuple: (features, files) or None if error occurs
-    """
-    # Create cache file in the same directory as the script
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    CACHE_FILE = os.path.join(script_dir, f'histogram_cache_{config["name"]}.npz')
+    if os.path.exists(cache_file):
+        print(f"Loading histograms from cache for config {config['name']}...")
+        features = np.load(cache_file)
+        return features
     
-    try:
-        # Check for cached histograms
-        if os.path.exists(CACHE_FILE):
-            print(f"Loading histograms from cache for config {config['name']}...")
-            data = np.load(CACHE_FILE, allow_pickle=True)
-            return data['features'], list(data['files'])
+    print(f"Computing histograms for config {config['name']}...")
+    features = []
+    
+    # Process each image
+    image_files = [f for f in os.listdir(IMAGE_PATH) if f.endswith('.bmp')]
+    for filename in tqdm(image_files, desc="Processing images"):
+        img_path = os.path.join(IMAGE_PATH, filename)
+        img = cv2.imread(img_path)
         
-        # Compute new histograms
-        print(f"Computing histograms for config {config['name']}...")
-        features = []
-        files = []
+        if img is None:
+            print(f"Warning: Could not load image: {img_path}")
+            continue
         
-        # Get all image files
-        image_files = [f for f in os.listdir(IMAGE_PATH) if f.endswith('.bmp')]
-        if not image_files:
-            raise ValueError(f"No image files found in '{IMAGE_PATH}'!")
-        
-        # Process each image
-        for filename in tqdm(image_files, desc="Processing images"):
-            img_path = os.path.join(IMAGE_PATH, filename)
-            img = cv2.imread(img_path)
-            
-            if img is None:
-                print(f"Warning: Could not load image: {img_path}")
-                continue
-            
-            # Compute histogram with specified quantization
+        # Compute histogram based on configuration
+        if config.get('use_spatial', False):
+            hist = compute_spatial_histogram(
+                img,
+                r_bins=config['r'],
+                g_bins=config['g'],
+                b_bins=config['b'],
+                grid_size=config['grid_size']
+            )
+        else:
             hist = compute_global_histogram(
                 img,
                 r_bins=config['r'],
                 g_bins=config['g'],
                 b_bins=config['b']
             )
-            
-            files.append(img_path)
-            features.append(hist)
-        
-        if not features:
-            raise ValueError("No valid images processed!")
-        
-        # Convert to numpy array and cache
-        features = np.array(features)
-        print("Saving histograms to cache...")
-        np.savez(CACHE_FILE, features=features, files=files)
-        
-        return features, files
-        
-    except Exception as e:
-        print(f"Error processing configuration {config['name']}: {str(e)}")
-        return None
-
-def process_query(query_path, features, files, config, results_dir):
-    """
-    Process a single query image.
+        features.append(hist)
     
-    Args:
-        query_path: Path to query image
-        features: Array of precomputed features
-        files: List of file paths
-        config: Current configuration
-        results_dir: Directory to save results
-    """
+    features = np.array(features)
+    np.save(cache_file, features)
+    
+    return features
+
+def process_query(query_path, features, config, results_dir):
+    """Process a single query image."""
     try:
-        # Convert files to a list if it's not already
-        files_list = files.tolist() if isinstance(files, np.ndarray) else files
+        # Get all image files
+        image_files = [f for f in os.listdir(IMAGE_PATH) if f.endswith('.bmp')]
+        files = [os.path.join(IMAGE_PATH, f) for f in image_files]
         
-        # Get query index and class
-        query_idx = files_list.index(query_path)
-        query_class = get_image_class(query_path)
+        # Compute query image features
+        query_img = cv2.imread(query_path)
         
-        # Compute distances to all images
+        # Compute histogram based on configuration
+        if config.get('use_spatial', False):
+            query_hist = compute_spatial_histogram(
+                query_img,
+                r_bins=config['r'],
+                g_bins=config['g'],
+                b_bins=config['b'],
+                grid_size=config['grid_size']
+            )
+        else:
+            query_hist = compute_global_histogram(
+                query_img,
+                r_bins=config['r'],
+                g_bins=config['g'],
+                b_bins=config['b']
+            )
+        
+        # Compute distances
         distances = []
         for i, feat in enumerate(features):
-            dist = euclidean_distance(features[query_idx], feat)
-            distances.append((dist, files_list[i]))
+            dist = euclidean_distance(query_hist, feat)
+            distances.append((dist, files[i]))
         
-        # Sort by distance
-        distances.sort(key=lambda x: x[0])
+        # Sort distances
+        distances_sorted = sorted(distances)  # Sort based on first element (distance)
+        
+        # Get query class
+        query_class = get_image_class(query_path)
         
         # Compute PR curve
-        pr_data = compute_pr_curve(query_class, distances, len(files))
+        pr_data = compute_pr_curve(query_class, distances_sorted, len(files))
         
         # Save results
-        save_experiment_results(query_path, distances, pr_data, config, results_dir)
+        save_experiment_results(query_path, distances_sorted, pr_data, config, results_dir)
         
     except Exception as e:
         print(f"Error processing query {query_path}: {str(e)}")
-        raise  # Add this to see the full error traceback
+        raise
 
 def main():
     """Main execution function"""
+    args = parse_args()
+    
     # Check requirements
     if not check_requirements():
         sys.exit(1)
     
     print("Starting image retrieval system...")
     print(f"Using dataset: {IMAGE_FOLDER}")
-    print(f"Testing {len(CONFIGS)} different quantization configurations")
     
-    # Process each configuration
-    for config in CONFIGS:
-        print(f"\nProcessing configuration: R{config['r']}G{config['g']}B{config['b']}")
+    if args.compare_pca:
+        compare_pca_results()
+        return
+    
+    # Run appropriate experiment based on arguments
+    if args.pca_experiment:
+        pca = PCARetrieval(n_components=args.pca_components)
+        pca.run_experiment(
+            image_path=IMAGE_PATH,
+            results_base_dir='results'
+        )
+    else:
+        if args.spatial_grid:
+            configs_to_run = SPATIAL_CONFIGS
+            print("Running spatial grid experiments")
+        else:
+            configs_to_run = CONFIGS
+            print("Running standard histogram experiments")
         
-        # Process configuration
-        result = process_configuration(config)
-        if result is None:
-            continue
+        print(f"Testing {len(configs_to_run)} different configurations")
+        
+        # Process each configuration
+        for config in configs_to_run:
+            print(f"\nProcessing configuration: R{config['r']}G{config['g']}B{config['b']}")
             
-        features, files = result
-        
-        # Create results directory
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        results_dir = create_results_directory(config, timestamp)
-        
-        # Process each test query
-        print("\nProcessing test queries...")
-        for query_name, query_path in TEST_QUERIES.items():
-            print(f"Processing query: {query_name}")
-            process_query(query_path, features, files, config, results_dir)
-        
-        print(f"Results saved to: {results_dir}")
+            # Process configuration
+            features = process_configuration(config)
+            
+            # Create results directory
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            results_dir = create_results_directory(config, timestamp)
+            
+            # Process test queries
+            print("\nProcessing test queries...")
+            for query_name, query_path in TEST_QUERIES.items():
+                print(f"Processing query: {query_name}")
+                try:
+                    process_query(query_path, features, config, results_dir)
+                except Exception as e:
+                    print(f"Error processing query {query_path}: {str(e)}")
+                    continue
+            
+            print(f"Results saved to: {results_dir}")
     
     print("\nProcessing complete!")
 

@@ -1,0 +1,35 @@
+Found 4 PCA result directories
+
+Processing results for 128 components
+Loaded building: AP=0.105, P@10=0.100, P@20=0.100
+Loaded face: AP=0.241, P@10=0.200, P@20=0.350
+Loaded sheep: AP=0.094, P@10=0.200, P@20=0.100
+Loaded street: AP=0.203, P@10=0.400, P@20=0.250
+
+Processing results for 16 components
+Loaded building: AP=0.083, P@10=0.100, P@20=0.050
+Loaded face: AP=0.260, P@10=0.500, P@20=0.350
+Loaded sheep: AP=0.198, P@10=0.300, P@20=0.250
+Loaded street: AP=0.119, P@10=0.200, P@20=0.150
+
+Processing results for 32 components
+Loaded building: AP=0.082, P@10=0.100, P@20=0.050
+Loaded face: AP=0.226, P@10=0.400, P@20=0.250
+Loaded sheep: AP=0.223, P@10=0.400, P@20=0.350
+Loaded street: AP=0.132, P@10=0.300, P@20=0.150
+
+Processing results for 64 components
+Loaded building: AP=0.097, P@10=0.100, P@20=0.100
+Loaded face: AP=0.208, P@10=0.200, P@20=0.300
+Loaded sheep: AP=0.171, P@10=0.300, P@20=0.250
+Loaded street: AP=0.173, P@10=0.400, P@20=0.250
+
+Saved comparison plot to 'pca_comparison.png'
+
+Summary of Results:
+Components |   MAP   |  P@10   |  P@20   | Avg Correct
+-------------------------------------------------------
+       16 | 0.165 | 0.275 | 0.200 | 4.0
+       32 | 0.166 | 0.300 | 0.200 | 4.0
+       64 | 0.162 | 0.250 | 0.225 | 4.5
+      128 | 0.161 | 0.225 | 0.200 | 4.0

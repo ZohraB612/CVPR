@@ -1,0 +1,37 @@
+Analysis Report for Query Image: 6_1_s.bmp
+Query Class: 6
+
+Color Quantization Configuration:
+R: 8 bins
+G: 8 bins
+B: 4 bins
+Total bins: 256
+
+Retrieval Performance:
+Average Precision: 0.2226
+Precision@10: 0.400
+Precision@20: 0.350
+
+Retrieval Distribution Analysis (Top 20):
+Correct retrievals (same class): 7
+
+Most retrieved classes:
+- 7: 9 instances
+- 6: 7 instances
+- 8: 2 instances
+
+Distance Analysis:
+Minimum distance: 0.0140
+Maximum distance: 19.4505
+
+Top 10 Retrieved Images:
+1. 6_1_s.bmp - 6 ✓ (distance: 0.0140)
+2. 6_27_s.bmp - 6 ✓ (distance: 2.9550)
+3. 7_19_s.bmp - 7 ✗ (distance: 3.5739)
+4. 20_14_s.bmp - 20 ✗ (distance: 3.5841)
+5. 7_29_s.bmp - 7 ✗ (distance: 3.6439)
+6. 6_15_s.bmp - 6 ✓ (distance: 3.6939)
+7. 7_25_s.bmp - 7 ✗ (distance: 3.7208)
+8. 7_15_s.bmp - 7 ✗ (distance: 3.9230)
+9. 6_26_s.bmp - 6 ✓ (distance: 3.9250)
+10. 7_8_s.bmp - 7 ✗ (distance: 3.9945)
