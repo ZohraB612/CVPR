@@ -17,6 +17,9 @@ from src.histogram import compute_global_histogram, euclidean_distance
 from src.utils import get_image_class
 from src.evaluation import compute_pr_curve
 from src.visualisation import save_experiment_results
+from src.visualisation import (save_pr_curve, save_match_visualization, 
+                             save_confusion_matrix, save_analysis_report,
+                             calculate_ap)
 import matplotlib.pyplot as plt
 
 class PCARetrieval:
@@ -106,20 +109,50 @@ class PCARetrieval:
             distances = []
             for i, feat in enumerate(self.features):
                 dist = mahalanobis(query_pca, feat, self.inv_covariance)
-                distances.append((dist, self.files[i]))
+                distances.append((dist, str(self.files[i])))
             
             # Sort distances
             distances.sort()
             
             # Get query class and compute PR curve
-            query_class = get_image_class(query_path)
+            query_class = get_image_class(str(query_path))
             pr_data = compute_pr_curve(query_class, distances, len(self.files))
             
-            # Save results using existing visualization function
-            save_experiment_results(query_path, distances, pr_data, self.config, results_dir)
+            # Create query directory
+            query_name = os.path.splitext(os.path.basename(query_path))[0]
+            query_dir = os.path.join(results_dir, f"query_{query_name}")
+            os.makedirs(query_dir, exist_ok=True)
+            
+            # Save visualizations using your visualization module
+            save_pr_curve((pr_data['recall'], pr_data['precision']), 
+                         self.config, 
+                         query_dir)
+            
+            save_match_visualization(query_path, 
+                                   distances, 
+                                   self.config, 
+                                   query_dir)
+            
+            confusion_data = save_confusion_matrix(distances, 
+                                                 query_class, 
+                                                 query_dir)
+            
+            # Calculate AP for analysis report
+            ap = calculate_ap((pr_data['recall'], pr_data['precision']))
+            
+            # Save detailed analysis
+            save_analysis_report(query_path, 
+                               distances, 
+                               self.config, 
+                               ap, 
+                               confusion_data, 
+                               query_dir)
+            
+            print(f"Saved results for {query_name}")
             
         except Exception as e:
             print(f"Error processing PCA query {query_path}: {str(e)}")
+            raise
             
     def run_experiment(self, image_path, results_base_dir):
         """Run complete PCA experiment."""

@@ -8,50 +8,43 @@ Module: EEE3032 Computer Vision and Pattern Recognition
 """
 
 from src.utils import get_image_class
+import numpy as np
 
 def compute_pr_curve(query_class, distances, total_images):
     """
-    Compute precision-recall curve data points.
+    Compute precision-recall curve.
     
     Args:
-        query_class: Class ID of the query image
-        distances: List of (distance, image_path) tuples, sorted by distance
-        total_images: Total number of images in dataset
-    
+        query_class: Ground truth class of query image
+        distances: List of (distance, image_path) tuples
+        total_images: Total number of images
     Returns:
-        tuple: (recalls, precisions) lists for plotting
-        
-    Note:
-        - Adds (0,1) and (1,0) points to complete the curve
-        - Computes precision and recall at each rank
+        dict: Dictionary containing precision and recall arrays
     """
-    precisions = []
-    recalls = []
+    relevant = 0
+    precision = []
+    recall = []
     
-    # Count total relevant images (same class as query)
-    relevant_count = sum(1 for _, path in distances 
-                        if get_image_class(path) == query_class)
+    # Get total relevant (images of same class as query)
+    total_relevant = sum(1 for _, img_path in distances 
+                        if get_image_class(str(img_path)) == query_class)
     
-    # Compute precision and recall at each rank
-    true_positives = 0
-    for i, (_, path) in enumerate(distances, 1):
-        if get_image_class(path) == query_class:
-            true_positives += 1
+    if total_relevant == 0:
+        return {'precision': np.zeros(len(distances)), 
+                'recall': np.zeros(len(distances))}
+    
+    for i, (_, img_path) in enumerate(distances, 1):
+        # Check if retrieved image is of same class
+        if get_image_class(str(img_path)) == query_class:
+            relevant += 1
         
-        # Calculate metrics
-        precision = true_positives / i
-        recall = true_positives / relevant_count
-        
-        precisions.append(precision)
-        recalls.append(recall)
+        precision.append(relevant / i)
+        recall.append(relevant / total_relevant)
     
-    # Add endpoints for complete PR curve
-    recalls.insert(0, 0.0)
-    precisions.insert(0, 1.0)
-    recalls.append(1.0)
-    precisions.append(0.0)
-    
-    return recalls, precisions
+    return {
+        'precision': np.array(precision),
+        'recall': np.array(recall)
+    }
 
 def compute_average_precision(precisions, recalls):
     """
