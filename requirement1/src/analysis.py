@@ -50,7 +50,7 @@ def compare_pca_results():
     for dir in sorted(result_dirs):
         try:
             n_components = int(dir.split('_')[1])
-            print(f"\nProcessing results for {n_components} components")
+            # print(f"\nProcessing results for {n_components} components")
             
             query_results = []
             

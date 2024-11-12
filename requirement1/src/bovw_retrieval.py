@@ -25,25 +25,43 @@ class BoVWRetrieval:
         Args:
             config: Dictionary containing configuration parameters
                    - codebook_size: Number of visual words
-                   - detector: 'sift' or 'harris'
+                   - detector: 'sift', 'orb', 'akaze', 'brisk'
         """
         self.config = config
-        self.sift = cv2.SIFT_create()
+        self.detector = self._create_detector(config['detector'])
         self.codebook = None
         self.features = []
         self.files = []
         
+    def _create_detector(self, detector_name):
+        """Create feature detector based on name"""
+        if detector_name == 'sift':
+            return cv2.SIFT_create()
+        elif detector_name == 'orb':
+            return cv2.ORB_create()
+        elif detector_name == 'akaze':
+            return cv2.AKAZE_create()
+        elif detector_name == 'brisk':
+            return cv2.BRISK_create()
+        else:
+            raise ValueError(f"Unsupported detector: {detector_name}")
+    
     def extract_features(self, image):
         """
-        Extract SIFT features from image.
+        Extract features from image using selected detector.
         
         Args:
             image: Input image (BGR format)
         Returns:
-            numpy array: SIFT descriptors
+            numpy array: Feature descriptors
         """
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        keypoints, descriptors = self.sift.detectAndCompute(gray, None)
+        keypoints, descriptors = self.detector.detectAndCompute(gray, None)
+        
+        # Convert descriptors to float32 if needed (ORB and BRISK use uint8)
+        if descriptors is not None and self.config['detector'] in ['orb', 'brisk']:
+            descriptors = descriptors.astype(np.float32)
+        
         return descriptors
     
     def build_codebook(self, image_paths, codebook_size=1000):
@@ -54,18 +72,23 @@ class BoVWRetrieval:
             image_paths: List of image paths
             codebook_size: Number of visual words
         """
-        # Check for cached codebook
-        codebook_cache = f'cache_bovw_codebook_{codebook_size}.npy'
+        # Create cache directory if it doesn't exist
+        os.makedirs('cache', exist_ok=True)
+        
+        # Check for cached codebook with absolute path
+        cache_name = f"{self.config['detector']}_{codebook_size}"
+        codebook_cache = os.path.join(os.path.dirname(__file__), '..', 'cache', f'cache_bovw_codebook_{cache_name}.npy')
+        
         if os.path.exists(codebook_cache):
-            print("Loading cached codebook...")
+            print(f"Loading cached codebook from {codebook_cache}...")
             self.codebook = np.load(codebook_cache)
             return
 
         print("Building codebook...")
         all_descriptors = []
         
-        # Collect SIFT descriptors from all images
-        for path in tqdm(image_paths, desc="Extracting SIFT features"):
+        # Collect features from all images
+        for path in tqdm(image_paths, desc=f"Extracting {self.config['detector'].upper()} features"):
             img = cv2.imread(path)
             if img is None:
                 continue
@@ -86,6 +109,7 @@ class BoVWRetrieval:
         print("Codebook built successfully!")
         
         # Cache the codebook
+        print(f"Saving codebook to {codebook_cache}...")
         np.save(codebook_cache, self.codebook)
         
     def compute_bovw_features(self, image_paths):
@@ -95,10 +119,15 @@ class BoVWRetrieval:
         Args:
             image_paths: List of image paths
         """
-        # Check for cached features
-        features_cache = f'cache_bovw_features_{self.config["codebook_size"]}.npz'
+        # Create cache directory if it doesn't exist
+        os.makedirs('cache', exist_ok=True)
+        
+        # Check for cached features with absolute path
+        cache_name = f"{self.config['detector']}_{self.config['codebook_size']}"
+        features_cache = os.path.join(os.path.dirname(__file__), '..', 'cache', f'cache_bovw_features_{cache_name}.npz')
+        
         if os.path.exists(features_cache):
-            print("Loading cached BoVW features...")
+            print(f"Loading cached BoVW features from {features_cache}...")
             cache = np.load(features_cache)
             self.features = cache['features']
             self.files = cache['files']

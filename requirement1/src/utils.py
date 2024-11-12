@@ -62,7 +62,7 @@ def create_results_directory(config, timestamp):
     Returns:
         str: path to the results directory
     """
-    results_dir = f"results_R{config['r']}G{config['g']}B{config['b']}"
+    results_dir = f"results/results_R{config['r']}G{config['g']}B{config['b']}"
     os.makedirs(results_dir, exist_ok=True)
     return results_dir
 

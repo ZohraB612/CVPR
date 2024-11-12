@@ -52,7 +52,7 @@ def parse_args():
 def process_configuration(config):
     """Process a single quantization configuration."""
     # Create cache filename
-    cache_file = f"cache_{config['name']}.npy"
+    cache_file = f"cache/cache_{config['name']}.npy"
     
     if os.path.exists(cache_file):
         print(f"Loading histograms from cache for config {config['name']}...")
@@ -145,14 +145,23 @@ def process_query(query_path, features, config, results_dir):
         raise
 
 def main():
-    """Main execution function"""
+    """
+    Main function to run experiments
+    """
     args = parse_args()
     
-    # Check requirements
-    check_requirements()
+    print("\nDebug Information:")
+    print(f"Base Path: {BASE_PATH}")
+    print(f"Image Path: {IMAGE_PATH}")
+    print(f"Base Path exists?: {os.path.exists(BASE_PATH)}")
+    print(f"Image Path exists?: {os.path.exists(IMAGE_PATH)}")
+    
+    # Count .bmp files
+    bmp_count = len([f for f in os.listdir(IMAGE_PATH) if f.endswith('.bmp')])
+    print(f"Found {bmp_count} .bmp files")
     
     print("Starting image retrieval system...")
-    print(f"Using dataset: {IMAGE_FOLDER}\n")
+    print(f"Using dataset: {IMAGE_FOLDER}")
     
     if args.bovw:
         print("\nRunning BoVW retrieval experiment...")
@@ -213,18 +222,18 @@ def main():
     
     else:
         configs = SPATIAL_CONFIGS if args.spatial_grid else CONFIGS
-        print("Running histogram experiments")
-        print(f"Testing {len(configs)} different configurations\n")
+        print("\nRunning histogram experiments")
+        print(f"Testing {len(configs)} different configurations")
         
-        for config_name, config in configs.items():
-            print(f"Processing configuration: {config_name}")
+        for config in configs:  # Changed this line to iterate over list
+            print(f"\nProcessing configuration: {config['name']}")
             
             # Process all images
             features = process_configuration(config)
             
             # Process queries
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            results_dir = create_results_directory(f'{config_name}_{timestamp}')
+            results_dir = create_results_directory(f'{config["name"]}_{timestamp}')
             
             for query_name, query_path in TEST_QUERIES.items():
                 print(f"Processing query: {query_name}")

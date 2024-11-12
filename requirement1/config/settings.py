@@ -16,9 +16,9 @@ IMAGE_PATH = os.path.join(BASE_PATH, IMAGE_FOLDER)
 # These images will be used throughout all experiments
 TEST_QUERIES = {
     'building': os.path.join(BASE_PATH, 'Images/3_1_s.bmp'),
-    'face': os.path.join(BASE_PATH, 'Images/17_1_s.bmp'),
-    'sheep': os.path.join(BASE_PATH, 'Images/6_1_s.bmp'),
-    'street': os.path.join(BASE_PATH, 'Images/9_1_s.bmp')
+    'street': os.path.join(BASE_PATH, 'Images/17_1_s.bmp'),
+    'face': os.path.join(BASE_PATH, 'Images/6_1_s.bmp'),
+    'sheep': os.path.join(BASE_PATH, 'Images/9_1_s.bmp')
 }
 
 # Different quantization configurations to test

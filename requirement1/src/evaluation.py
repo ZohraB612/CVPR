@@ -48,7 +48,12 @@ def compute_pr_curve(query_class, distances, total_images):
 
 def compute_average_precision(precisions, recalls):
     """
-    Compute Average Precision (AP) from precision-recall values.
+    Compute Average Precision (AP) using the formula:
+    AP = sum(P(n) × rel(n)) / # relevant documents
+    
+    Where:
+    - P(n) is the precision at rank n
+    - rel(n) is 1 if result n is relevant, 0 otherwise
     
     Args:
         precisions: List of precision values
@@ -56,12 +61,16 @@ def compute_average_precision(precisions, recalls):
     
     Returns:
         float: Average Precision score
-        
-    Note:
-        - Implements area under PR curve using trapezoidal rule
-        - Standard metric in information retrieval
     """
-    ap = 0.0
-    for i in range(len(recalls) - 1):
-        ap += (recalls[i + 1] - recalls[i]) * (precisions[i + 1] + precisions[i]) / 2
+    # Get the changes in recall - when recall changes, it means we found a relevant document
+    recall_changes = np.diff(recalls, prepend=0)
+    # Number of relevant documents is the final recall × length (since recall = relevant/total_relevant)
+    num_relevant = int(recalls[-1] * len(recalls))
+    
+    if num_relevant == 0:
+        return 0.0
+        
+    # Sum precision values where recall changes (i.e., where we found relevant documents)
+    ap = np.sum(precisions[recall_changes > 0]) / num_relevant
+    
     return ap
