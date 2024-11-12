@@ -104,23 +104,7 @@ def process_query(query_path, features, config, results_dir):
         
         # Compute query image features
         query_img = cv2.imread(query_path)
-        
-        # Compute histogram based on configuration
-        if config.get('use_spatial', False):
-            query_hist = compute_spatial_histogram(
-                query_img,
-                r_bins=config['r'],
-                g_bins=config['g'],
-                b_bins=config['b'],
-                grid_size=config['grid_size']
-            )
-        else:
-            query_hist = compute_global_histogram(
-                query_img,
-                r_bins=config['r'],
-                g_bins=config['g'],
-                b_bins=config['b']
-            )
+        query_hist = compute_global_histogram(query_img, config['r'], config['g'], config['b'])
         
         # Compute distances
         distances = []
@@ -131,14 +115,38 @@ def process_query(query_path, features, config, results_dir):
         # Sort distances
         distances_sorted = sorted(distances)
         
-        # Get query class
+        # Compute precision-recall curve
         query_class = get_image_class(query_path)
+        relevant_count = sum(1 for _, path in distances_sorted 
+                           if get_image_class(path) == query_class)
         
-        # Compute PR curve
-        pr_data = compute_pr_curve(query_class, distances_sorted, len(files))
+        # Calculate precision and recall at each position
+        precisions = []
+        recalls = []
+        relevant_so_far = 0
+        
+        for i, (_, path) in enumerate(distances_sorted, 1):
+            if get_image_class(path) == query_class:
+                relevant_so_far += 1
+            precision = relevant_so_far / i
+            recall = relevant_so_far / relevant_count if relevant_count > 0 else 0
+            precisions.append(precision)
+            recalls.append(recall)
+        
+        # Convert to numpy arrays
+        precisions = np.array(precisions)
+        recalls = np.array(recalls)
+        
+        # Create pr_data tuple
+        pr_data = (recalls, precisions)
         
         # Save results
         save_experiment_results(query_path, distances_sorted, pr_data, config, results_dir)
+        
+        # Print P@10 for this query
+        p10 = sum(1 for _, path in distances_sorted[:10] 
+                 if get_image_class(path) == query_class) / 10
+        print(f"{query_class}: P@10 = {p10:.3f}")
         
     except Exception as e:
         print(f"Error processing query {query_path}: {str(e)}")
@@ -232,8 +240,7 @@ def main():
             features = process_configuration(config)
             
             # Process queries
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            results_dir = create_results_directory(f'{config["name"]}_{timestamp}')
+            results_dir = create_results_directory(config["name"])
             
             for query_name, query_path in TEST_QUERIES.items():
                 print(f"Processing query: {query_name}")

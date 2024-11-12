@@ -9,17 +9,44 @@ Module: EEE3032 Computer Vision and Pattern Recognition
 import os
 from config.settings import IMAGE_FOLDER, IMAGE_PATH, BASE_PATH
 
-def get_image_class(filename):
+def get_image_class(image_path):
     """
-    This function extracts the class ID from an image filename.
+    Extract class from image path.
     
     Args:
-        filename: Path to image file (e.g., '3_1_s.bmp')
-        
+        image_path (str): Path to image file
+    
     Returns:
-        str: Class ID (e.g., '3')
+        str: Class name
     """
-    return os.path.basename(filename).split('_')[0]
+    filename = os.path.basename(image_path)
+    class_num = filename.split('_')[0]
+    
+    # Class mapping from numeric ID to class name
+    class_mapping = {
+        '1': 'farm animals',
+        '2': 'trees',
+        '3': 'buildings',
+        '4': 'airplanes',
+        '5': 'cows',
+        '6': 'faces',
+        '7': 'cars',
+        '8': 'bicycles',
+        '9': 'sheep',
+        '10': 'flowers',
+        '11': 'signs',
+        '12': 'birds',
+        '13': 'books',
+        '14': 'chairs',
+        '15': 'cats',
+        '16': 'dogs',
+        '17': 'street',
+        '18': 'nature',
+        '19': 'people',
+        '20': 'boats'
+    }
+    
+    return class_mapping.get(class_num, class_num)
 
 def check_requirements():
     """
@@ -52,17 +79,18 @@ def check_requirements():
     print(f"Found {len(image_files)} .bmp files")
     return True
 
-def create_results_directory(config, timestamp):
+def create_results_directory(experiment_name):
     """
-    We use this function to create (if it doesn't exist) and return the path to the results directory.
+    Create and return path to results directory.
     
     Args:
-        config: quantisation configuration dict
+        experiment_name (str): Name of the experiment
         
     Returns:
-        str: path to the results directory
+        str: Path to results directory
     """
-    results_dir = f"results/results_R{config['r']}G{config['g']}B{config['b']}"
+    # Create results directory if it doesn't exist
+    results_dir = os.path.join('results', experiment_name)
     os.makedirs(results_dir, exist_ok=True)
     return results_dir
 

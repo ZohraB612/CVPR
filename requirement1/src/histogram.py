@@ -1,6 +1,6 @@
 """
 Colour histogram computation module.
-Implements global color histogram extraction with variable quantization levels.
+Implements global colour histogram extraction with variable quantisation levels.
 
 Author: Zohra Bouchamaoui
 Student ID: 6848526
@@ -13,7 +13,7 @@ import numpy as np
 
 def compute_global_histogram(img, r_bins=8, g_bins=8, b_bins=4):
     """
-    Compute global color histogram for an image.
+    Compute global colour histogram for an image.
     
     Args:
         img: Input image (BGR format)
@@ -129,3 +129,22 @@ def mahalanobis_distance(hist1, hist2):
         # If covariance matrix is singular, fall back to Euclidean distance
         print("Warning: Covariance matrix is singular, falling back to Euclidean distance")
         return euclidean_distance(hist1, hist2)
+
+def cosine_distance(hist1, hist2):
+    """
+    Function to compute Cosine distance between two histograms.
+    
+    Args:
+        hist1: 1st histogram
+        hist2: 2nd histogram
+        
+    Returns:
+        float: cosine distance (1 - cosine similarity)
+    """
+    dot_product = np.dot(hist1, hist2)
+    norm1 = np.linalg.norm(hist1)
+    norm2 = np.linalg.norm(hist2)
+    
+    # Add small epsilon to avoid division by zero
+    eps = 1e-10
+    return 1.0 - dot_product / (norm1 * norm2 + eps)

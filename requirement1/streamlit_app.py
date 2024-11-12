@@ -38,7 +38,8 @@ from src.histogram import (
     manhattan_distance, 
     chi_square_distance, 
     intersection_distance,
-    mahalanobis_distance
+    mahalanobis_distance,
+    cosine_distance
 )
 from src.spatial_histogram import compute_spatial_histogram
 from src.pca_retrieval import PCARetrieval
@@ -68,7 +69,7 @@ def get_class_from_filename(filename):
         '14': 'chairs',
         '15': 'cats',
         '16': 'dogs',
-        '17': 'street',
+        '17': 'streets',
         '18': 'nature',
         '19': 'people',
         '20': 'boats',
@@ -76,41 +77,70 @@ def get_class_from_filename(filename):
     return class_mapping.get(class_num, 'unknown')
 
 def normalize_class_name(class_name):
-    """
-    Normalize class names to handle variations like 'building' vs 'buildings'
-    
-    Args:
-        class_name: Original class name
-    Returns:
-        Normalized class name
-    """
-    # Common variations mapping
-    variations = {
+    """Normalize class names to match the mapping"""
+    class_mapping = {
         'buildings': 'building',
         'building': 'building',
-        'flowers': 'flower',
-        'flower': 'flower',
-        'birds': 'bird',
-        'bird': 'bird',
-        'cats': 'cat',
-        'cat': 'cat',
-        'dogs': 'dog',
-        'dog': 'dog',
-        'people': 'person',
-        'person': 'person',
-        'boats': 'boat',
-        'boat': 'boat'
+        'airplane': 'airplane',
+        'animal': 'farm animal',
+        'streets': 'streets',
+        'street': 'streets',
+        'faces': 'face',
+        'face': 'face',
+        'sheep': 'sheep',
     }
     
-    # Convert to lowercase and look up in variations
-    normalized = variations.get(class_name.lower(), class_name.lower())
+    # Convert to lowercase and normalize
+    normalized = class_name.lower()
+    if normalized not in class_mapping:
+        # Remove trailing 's' if present
+        if normalized.endswith('s'):
+            normalized = normalized[:-1]
+    else:
+        normalized = class_mapping[normalized]
+        
+    print(f"Normalizing '{class_name}' to '{normalized}'")
     return normalized
 
 def main():
+    # Define class mapping and class_to_idx at the start
+    class_mapping = {
+        '1': 'building',
+        '2': 'tree',
+        '3': 'building',
+        '4': 'airplane',
+        '5': 'cow',
+        '6': 'face',
+        '7': 'car',
+        '8': 'bicycle',
+        '9': 'sheep',
+        '10': 'flower',
+        '11': 'sign',
+        '12': 'bird',
+        '13': 'book',
+        '14': 'chair',
+        '15': 'cat',
+        '16': 'dog',
+        '17': 'streets',
+        '18': 'nature',
+        '19': 'people',
+        '20': 'boat',
+    }
+    
+    # Create class_to_idx dictionary with both singular and plural forms
+    unique_classes = sorted(set(class_mapping.values()))
+    class_to_idx = {}
+    for idx, class_name in enumerate(unique_classes):
+        class_to_idx[class_name] = idx
+
+    # Always show debug info temporarily
+    st.write("Available classes:", list(class_to_idx.keys()))
+    st.write("Class mapping:", class_mapping)
+
     # Add task selection at the top
     task = st.sidebar.radio(
         "Select Task",
-        ["Image Retrieval", "Image Classification"]
+        ["Image Retrieval"]
     )
 
     if task == "Image Classification":
@@ -193,7 +223,7 @@ def main():
         # Query image selection
         query_source = st.radio(
             "Select Query Source",
-            ["Test Queries", "Upload Custom Image"]
+            ["Test Queries"]
         )
         
         query_img = None
@@ -229,20 +259,21 @@ def main():
             config = None
             
             if retrieval_method == "Color Histogram":
-                r_bins = st.sidebar.selectbox("R Bins", options=[2, 4, 8, 16], index=2)
-                g_bins = st.sidebar.selectbox("G Bins", options=[2, 4, 8, 16], index=2)
-                b_bins = st.sidebar.selectbox("B Bins", options=[2, 4, 8, 16], index=2)
+                r_bins = st.sidebar.selectbox("R Bins", options=[2, 4, 8, 16, 32], index=2)
+                g_bins = st.sidebar.selectbox("G Bins", options=[2, 4, 8, 16, 32], index=2)
+                b_bins = st.sidebar.selectbox("B Bins", options=[2, 4, 8, 16, 32], index=2)
                 
                 # Add distance metric selection
                 distance_metric = st.sidebar.selectbox(
                     "Distance Metric",
-                    ["Euclidean", "Manhattan", "Chi-Square", "Intersection", "Mahalanobis"],
+                    ["Euclidean", "Manhattan", "Chi-Square", "Intersection", "Mahalanobis", "Cosine"],
                     help="""
                     Euclidean: Standard L2 distance
                     Manhattan: L1 distance, less sensitive to outliers
                     Chi-Square: Normalized bin differences
                     Intersection: Overlap between histograms
                     Mahalanobis: Statistical distance accounting for correlations
+                    Cosine: Angle-based similarity measure
                     """
                 )
                 
@@ -260,6 +291,25 @@ def main():
                     options=[8, 16, 32, 64, 128, 256],
                     index=2  # Default to 32
                 )
+                
+                # Add distance metric selection for PCA
+                distance_metric = st.sidebar.selectbox(
+                    "Distance Metric",
+                    ["Euclidean", "Manhattan", "Chi-Square", "Intersection", "Mahalanobis", "Cosine"],
+                    help="""
+                    Euclidean: Standard L2 distance
+                    Manhattan: L1 distance, less sensitive to outliers
+                    Chi-Square: Normalized differences
+                    Intersection: Overlap between histograms
+                    Mahalanobis: Statistical distance accounting for correlations
+                    Cosine: Angle-based similarity measure
+                    """
+                )
+                
+                config = {
+                    'n_components': n_components,
+                    'distance_metric': distance_metric
+                }
             elif retrieval_method == "Spatial Histogram":
                 r_bins = st.sidebar.selectbox("R Bins", options=[2, 4, 8, 16], index=2)
                 g_bins = st.sidebar.selectbox("G Bins", options=[2, 4, 8, 16], index=2)
@@ -296,7 +346,6 @@ def main():
                         "hellinger",
                         "bhattacharyya",
                         "kl_divergence",
-                        "jensen_shannon",
                         "cosine"
                     ],
                     index=0,
@@ -307,7 +356,6 @@ def main():
                     Hellinger: Statistical distance
                     Bhattacharyya: Similarity between distributions
                     KL Divergence: Information theory based
-                    Jensen-Shannon: Symmetric KL divergence
                     Cosine: Angle-based similarity
                     """
                 )
@@ -338,6 +386,20 @@ def main():
             elif query_path:  # For uploaded images
                 query_class = get_class_from_filename(os.path.basename(query_path))
 
+            # Add debug prints before class lookup
+            if query_class:
+                st.write(f"Original query class: {query_class}")
+                query_class = normalize_class_name(query_class)
+                st.write(f"Normalized query class: {query_class}")
+                st.write("Available classes:", list(class_to_idx.keys()))
+                
+                try:
+                    query_idx = class_to_idx[query_class]
+                    st.write(f"Found index: {query_idx}")
+                except KeyError:
+                    st.error(f"Class '{query_class}' not found in available classes: {list(class_to_idx.keys())}")
+                    return
+
             if st.button("Find Similar Images"):
                 with st.spinner("Processing..."):
                     results = []
@@ -345,7 +407,7 @@ def main():
                     if retrieval_method == "Color Histogram":
                         results = process_histogram_query(query_img, config, query_path)
                     elif retrieval_method == "PCA":
-                        results = process_pca_query(query_img, n_components, query_path)
+                        results = process_pca_query(query_img, config, query_path)
                     elif retrieval_method == "Spatial Histogram":
                         results = process_spatial_histogram_query(query_img, config, query_path)
                     elif retrieval_method == "Bag of Visual Words":
@@ -357,8 +419,8 @@ def main():
 
                 if results:
                     # Debug information
-                    st.write(f"Total results found: {len(results)}")
-                    st.write(f"First few distances: {[x[0] for x in results[:3]]}")
+                    # st.write(f"Total results found: {len(results)}")
+                    # st.write(f"First few distances: {[x[0] for x in results[:3]]}")
                     
                     # Display results
                     st.subheader("Retrieved Images")
@@ -617,7 +679,8 @@ def process_histogram_query(query_img, config, query_path=None):
         'Manhattan': manhattan_distance,
         'Chi-Square': chi_square_distance,
         'Intersection': intersection_distance,
-        'Mahalanobis': mahalanobis_distance
+        'Mahalanobis': mahalanobis_distance,
+        'Cosine': cosine_distance
     }
     
     distance_func = distance_functions[config['distance_metric']]
@@ -757,11 +820,11 @@ def process_spatial_histogram_query(query_img, config, query_path=None):
         st.write("Traceback:", traceback.format_exc())
         return []
 
-def process_pca_query(query_img, n_components, query_path=None):
+def process_pca_query(query_img, config, query_path=None):
     """Process query using PCA"""
     try:
         # Initialize PCA retrieval
-        pca_retriever = PCARetrieval(n_components=n_components)
+        pca_retriever = PCARetrieval(n_components=config['n_components'])
         
         # Compute features for all images
         pca_retriever.compute_features(IMAGE_PATH)
@@ -786,15 +849,28 @@ def process_pca_query(query_img, n_components, query_path=None):
             query_centered = query_hist - pca_retriever.mean
             query_pca = pca_retriever.pca.transform(query_centered.reshape(1, -1))[0]
             
-            # Compute distances
+            # Compute distances using selected metric
             for i, feat in enumerate(pca_retriever.features):
                 img_path = pca_retriever.files[i]
                 is_query = os.path.abspath(img_path) == os.path.abspath(query_path)
                 
                 if is_query:
-                    dist = 0.0  # Force distance to 0 for query image
+                    dist = 0.0
                 else:
-                    dist = mahalanobis(query_pca, feat, pca_retriever.inv_covariance)
+                    if config['distance_metric'] == 'Euclidean':
+                        dist = euclidean_distance(query_pca, feat)
+                    elif config['distance_metric'] == 'Manhattan':
+                        dist = manhattan_distance(query_pca, feat)
+                    elif config['distance_metric'] == 'Chi-Square':
+                        dist = chi_square_distance(query_pca, feat)
+                    elif config['distance_metric'] == 'Intersection':
+                        dist = intersection_distance(query_pca, feat)
+                    elif config['distance_metric'] == 'Mahalanobis':
+                        dist = mahalanobis_distance(query_pca, feat)
+                    elif config['distance_metric'] == 'Cosine':
+                        dist = cosine_distance(query_pca, feat)
+                    else:  # Default to Euclidean if unknown metric
+                        dist = euclidean_distance(query_pca, feat)
                 
                 distances.append((dist, img_path, is_query))
         
@@ -880,8 +956,16 @@ def process_bovw_query(query_img, config, query_path=None):
         # Compute distances
         distances = []
         for i, feat in enumerate(bovw.features):
-            dist = compute_bovw_distance(query_hist, feat, config['distance_metric'])
-            distances.append((dist, bovw.files[i], False))
+            img_path = bovw.files[i]
+            # Check if this is the query image
+            is_query = query_path and os.path.abspath(img_path) == os.path.abspath(query_path)
+            
+            if is_query:
+                dist = 0.0
+            else:
+                dist = compute_bovw_distance(query_hist, feat, config['distance_metric'])
+            
+            distances.append((dist, img_path, is_query))
                 
         # Sort distances
         distances.sort(key=lambda x: x[0])
@@ -1133,11 +1217,6 @@ def compute_bovw_distance(query_hist, db_hist, distance_type='euclidean'):
     elif distance_type == 'kl_divergence':
         eps = 1e-10
         return np.sum(query_hist * np.log((query_hist + eps) / (db_hist + eps)))
-    elif distance_type == 'jensen_shannon':
-        eps = 1e-10
-        m = 0.5 * (query_hist + db_hist)
-        return 0.5 * np.sum(query_hist * np.log((query_hist + eps) / (m + eps))) + \
-               0.5 * np.sum(db_hist * np.log((db_hist + eps) / (m + eps)))
     elif distance_type == 'cosine':
         return 1 - np.dot(query_hist, db_hist) / \
                (np.linalg.norm(query_hist) * np.linalg.norm(db_hist))

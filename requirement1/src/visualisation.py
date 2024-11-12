@@ -71,89 +71,56 @@ def get_class_from_filename(filename):
     return class_mapping.get(class_num, 'unknown')
 
 def plot_histogram_comparison(query_hist, match_hist, config, ax):
-    """Plot histogram comparison with support for multiple feature types."""
-    feature_dim = len(query_hist)
+    """
+    Plot histogram comparison with support for multiple feature types.
     
-    # Determine if using spatial grid features
-    grid_size = config.get('grid', (4, 4))  # Default to 4x4 grid
-    is_spatial = grid_size != (1, 1)
+    Args:
+        query_hist: Query image histogram
+        match_hist: Matching image histogram
+        config: Configuration dictionary
+        ax: Matplotlib axis object
+    """
+    # Calculate total number of bins
+    total_bins = config['r'] * config['g'] * config['b']
+    x = np.arange(total_bins)
     
-    if is_spatial:
-        # Calculate features per cell
-        features_per_cell = feature_dim // (grid_size[0] * grid_size[1])
-        
-        # Calculate feature type boundaries
-        bgr_size = config['r'] * config['g'] * config['b']
-        hsv_size = 8 * 8  # HSV histogram size
-        lab_size = 8 * 8  # Lab histogram size
-        texture_size = 4 * 2  # 4 orientations * 2 features (mean, std)
-        edge_size = 3  # Edge features (mean, std, density)
-        
-        # Clear and create new figure
-        ax.clear()
-        fig = ax.figure
-        fig.clear()
-        
-        # Create subplots for each grid cell
-        for i in range(grid_size[0]):
-            for j in range(grid_size[1]):
-                cell_idx = i * grid_size[1] + j
-                start_idx = cell_idx * features_per_cell
-                
-                # Create subplot
-                subplot_idx = i * grid_size[1] + j + 1
-                ax_cell = fig.add_subplot(grid_size[0], grid_size[1], subplot_idx)
-                
-                # Plot different feature types with different colors
-                x = np.arange(features_per_cell)
-                
-                # BGR histogram
-                ax_cell.bar(x[:bgr_size], 
-                          query_hist[start_idx:start_idx+bgr_size],
-                          alpha=0.6, color='blue', label='Query BGR' if cell_idx == 0 else "")
-                ax_cell.bar(x[:bgr_size],
-                          match_hist[start_idx:start_idx+bgr_size],
-                          alpha=0.3, color='red', label='Match BGR' if cell_idx == 0 else "")
-                
-                # HSV histogram
-                hsv_start = bgr_size
-                ax_cell.bar(x[hsv_start:hsv_start+hsv_size], 
-                          query_hist[start_idx+hsv_start:start_idx+hsv_start+hsv_size],
-                          alpha=0.6, color='green', label='Query HSV' if cell_idx == 0 else "")
-                
-                # Lab histogram
-                lab_start = hsv_start + hsv_size
-                ax_cell.bar(x[lab_start:lab_start+lab_size], 
-                          query_hist[start_idx+lab_start:start_idx+lab_start+lab_size],
-                          alpha=0.6, color='purple', label='Query Lab' if cell_idx == 0 else "")
-                
-                # Texture and edge features
-                texture_start = lab_start + lab_size
-                ax_cell.bar(x[texture_start:], 
-                          query_hist[start_idx+texture_start:start_idx+features_per_cell],
-                          alpha=0.6, color='orange', label='Query Texture+Edge' if cell_idx == 0 else "")
-                
-                ax_cell.set_title(f'Cell ({i},{j})')
-                if cell_idx == 0:
-                    ax_cell.legend(loc='upper right')
-                
-                # Remove x-axis labels to reduce clutter
-                ax_cell.set_xticks([])
-        
-        plt.tight_layout()
+    # Clear existing plot
+    ax.clear()
+    
+    # Thick bars
+    width = 0.8
+    
+    # Simple bar plot comparison
+    ax.bar(x - width/2, query_hist, width, label='Query', alpha=0.8, color='blue')
+    ax.bar(x + width/2, match_hist, width, label='Match', alpha=0.8, color='red')
+    
+    # Customize plot with larger font sizes
+    ax.set_xlabel('Bin', fontsize=14)
+    ax.set_ylabel('Normalized Count', fontsize=14)
+    ax.legend(fontsize=14)
+    
+    # Set title based on configuration
+    title = f'Histogram (R{config["r"]}G{config["g"]}B{config["b"]})'
+    ax.set_title(title, fontsize=16, pad=20)
+    
+    # Adjust x-axis for readability
+    if total_bins > 20:
+        ax.set_xticks([])
     else:
-        # Original histogram plotting for non-spatial features
-        ax.bar(x - 0.2, query_hist, 0.4, label='Query', alpha=0.6, color='blue')
-        ax.bar(x + 0.2, match_hist, 0.4, label='Match', alpha=0.6, color='red')
-        ax.set_xlabel('Bin')
-        ax.set_ylabel('Normalized Count')
-        ax.legend()
+        ax.set_xticks(x)
+        ax.tick_params(axis='both', which='major', labelsize=12)
+    
+    # Set y-axis limits
+    ax.set_ylim([0, max(np.max(query_hist), np.max(match_hist)) * 1.1])
+    ax.tick_params(axis='y', labelsize=12)
 
-def save_match_visualization(query_path, matches, config, save_dir):
+def save_match_visualization(query_path, distances, config, save_dir):
     """Create and save visualization of query and top matches with histograms."""
-    # Create figure with subplots
-    fig = plt.figure(figsize=(20, 25))
-    gs = plt.GridSpec(11, 2, height_ratios=[1] + [2]*10)
+    # Create larger figure
+    fig = plt.figure(figsize=(25, 35))
+    
+    # Adjust grid to make images larger relative to histograms
+    gs = plt.GridSpec(11, 2, height_ratios=[1.5] + [2.5]*10)
     
     # Query image and histogram
     query_img = cv2.imread(query_path)
@@ -163,16 +130,17 @@ def save_match_visualization(query_path, matches, config, save_dir):
     # Plot query image
     ax_query = fig.add_subplot(gs[0, 0])
     ax_query.imshow(query_img)
-    ax_query.set_title(f'Query Image\nClass: {get_image_class(query_path)}')
+    ax_query.set_title(f'Query Image\nClass: {get_image_class(query_path)}', 
+                      fontsize=16, pad=20)
     ax_query.axis('off')
     
     # Plot query histogram
     ax_query_hist = fig.add_subplot(gs[0, 1])
     plot_histogram_comparison(query_hist, query_hist, config, ax_query_hist)
-    ax_query_hist.set_title('Query Histogram')
+    ax_query_hist.set_title('Query Histogram', fontsize=16, pad=20)
     
     # Plot top matches with histograms
-    for i, (dist, match_path) in enumerate(matches[:10], 1):
+    for i, (dist, match_path) in enumerate(distances[:10], 1):
         match_img = cv2.imread(match_path)
         match_img = cv2.cvtColor(match_img, cv2.COLOR_BGR2RGB)
         match_hist = compute_global_histogram(match_img, config['r'], config['g'], config['b'])
@@ -182,7 +150,8 @@ def save_match_visualization(query_path, matches, config, save_dir):
         ax_match.imshow(match_img)
         match_class = get_image_class(match_path)
         correct = '✓' if match_class == get_image_class(query_path) else '✗'
-        ax_match.set_title(f'Match {i} ({correct})\nClass: {match_class}\nDist: {dist:.3f}')
+        ax_match.set_title(f'Match {i} ({correct})\nClass: {match_class}\nDist: {dist:.3f}', 
+                          fontsize=16, pad=20)
         ax_match.axis('off')
         
         # Plot histogram comparison
@@ -190,7 +159,9 @@ def save_match_visualization(query_path, matches, config, save_dir):
         plot_histogram_comparison(query_hist, match_hist, config, ax_hist)
     
     plt.tight_layout()
-    plt.savefig(os.path.join(save_dir, 'search_results.png'), dpi=DPI, bbox_inches='tight')
+    plt.savefig(os.path.join(save_dir, 'search_results.png'), 
+                dpi=300, 
+                bbox_inches='tight')
     plt.close()
 
 def save_pr_curve(pr_data, config, save_dir):
@@ -208,7 +179,7 @@ def save_pr_curve(pr_data, config, save_dir):
     
     plt.xlabel('Recall')
     plt.ylabel('Precision')
-    plt.title(f'Precision-Recall Curve\nConfiguration: R{config["r"]}G{config["g"]}B{config["b"]}')
+    plt.title(f'Precision-Recall Curve for\nConfiguration: R{config["r"]}G{config["g"]}B{config["b"]}')
     plt.grid(True)
     
     plt.savefig(os.path.join(save_dir, 'pr_curve.png'), dpi=DPI, bbox_inches='tight')
@@ -218,12 +189,12 @@ def save_pr_curve(pr_data, config, save_dir):
 
 def create_confusion_matrix(distances, query_class, num_display=20):
     """
-    Create normalized confusion matrix for retrieval results.
+    Create confusion matrix for retrieval results using raw counts.
     
     Args:
-        distances: List of (distance, path, is_query) tuples
-        query_class: Class of the query image
-        num_display: Number of top matches to consider
+        distances (list): List of (distance, path) tuples
+        query_class (str): Class of query image
+        num_display (int): Number of top matches to consider
     
     Returns:
         tuple: (confusion_matrix, class_names)
@@ -238,19 +209,18 @@ def create_confusion_matrix(distances, query_class, num_display=20):
     try:
         # Get predictions for top N results
         predictions = []
-        for _, path, _ in distances[:num_display]:
+        for _, path in distances[:num_display]:
             filename = os.path.basename(path)
             class_num = filename.split('_')[0]
             pred_class = class_mapping.get(class_num, 'unknown')
             predictions.append(pred_class)
         
-        # For each predicted class, update confusion matrix
+        # For each predicted class, update confusion matrix with raw counts
         query_idx = all_classes.index(query_class)
         for pred_class in predictions:
             try:
                 pred_idx = all_classes.index(pred_class)
-                # Normalize by number of predictions
-                conf_matrix[query_idx, pred_idx] += 1.0 / len(predictions)
+                conf_matrix[query_idx, pred_idx] += 1  # Raw count increment
             except ValueError:
                 print(f"Warning: Prediction class {pred_class} not found in class list")
                 continue
@@ -259,34 +229,46 @@ def create_confusion_matrix(distances, query_class, num_display=20):
         print(f"Error creating confusion matrix: {str(e)}")
         print(f"Query class: {query_class}")
         print(f"Available classes: {all_classes}")
-        # Return empty matrix if error occurs
         return np.zeros((n_classes, n_classes)), all_classes
     
     return conf_matrix, all_classes
 
 def save_confusion_matrix(distances, query_class, save_dir):
-    """Save normalized confusion matrix visualization."""
+    """
+    Save confusion matrix visualization with raw counts, showing only the query class row.
+    
+    Args:
+        distances (list): List of (distance, path) tuples
+        query_class (str): Class of query image
+        save_dir (str): Directory to save visualization
+    """
+    # Create confusion matrix
     conf_matrix, classes = create_confusion_matrix(distances, query_class)
     
-    plt.figure(figsize=(12, 10))
+    # Get only the row corresponding to the query class
+    query_idx = classes.index(query_class)
+    conf_matrix_row = conf_matrix[query_idx:query_idx+1, :]
     
-    # Create heatmap with normalized values
-    sns.heatmap(conf_matrix, 
+    # Convert matrix to integers
+    conf_matrix_row = conf_matrix_row.astype(int)
+    
+    plt.figure(figsize=(15, 3))  # Adjusted figure size for single row
+    
+    # Create heatmap with raw counts
+    sns.heatmap(conf_matrix_row, 
                 annot=True, 
-                fmt='.2f',
+                fmt='d',  # Use integer format for raw counts
                 cmap='Blues',
                 xticklabels=classes,
-                yticklabels=classes,
-                vmin=0,
-                vmax=1)
+                yticklabels=[query_class],
+                cbar=False)  # Remove colorbar as it's less relevant for single row
     
-    plt.title('Normalized Confusion Matrix for Retrieved Results')
-    plt.xlabel('Retrieved Class')
-    plt.ylabel('Query Class')
+    plt.title(f'Distribution of Retrieved Results for {query_class}', fontsize=14, pad=20)
+    plt.xlabel('Retrieved Class', fontsize=12)
     
     # Rotate labels for better readability
-    plt.xticks(rotation=45, ha='right')
-    plt.yticks(rotation=0)
+    plt.xticks(rotation=45, ha='right', fontsize=10)
+    plt.yticks(rotation=0, fontsize=10)
     
     # Adjust layout
     plt.tight_layout()
@@ -296,7 +278,7 @@ def save_confusion_matrix(distances, query_class, save_dir):
     plt.savefig(plot_path, bbox_inches='tight', dpi=300)
     plt.close()
     
-    return conf_matrix, classes
+    return conf_matrix_row, classes
 
 def get_class_name(class_id):
     """
@@ -332,17 +314,35 @@ def calculate_ap(pr_data):
     Calculate Average Precision from precision-recall data.
     
     Args:
-        pr_data: Tuple of (recalls, precisions)
+        pr_data: Tuple of (recalls, precisions) as numpy arrays
         
     Returns:
         float: Average Precision value
     """
     recalls, precisions = pr_data
+    
+    # Ensure inputs are numpy arrays and not empty
+    if len(recalls) == 0 or len(precisions) == 0:
+        return 0.0
+        
+    # Convert to numpy arrays if they aren't already
+    recalls = np.array(recalls)
+    precisions = np.array(precisions)
+    
     # Calculate area under PR curve using trapezoidal rule
     return np.trapz(precisions, recalls)
 
 def save_experiment_results(query_path, distances, pr_data, config, results_dir):
-    """Save all experiment results."""
+    """
+    Save all experiment results.
+    
+    Args:
+        query_path (str): Path to query image
+        distances (list): List of (distance, path) tuples
+        pr_data: Precision-recall data
+        config (dict): Configuration dictionary
+        results_dir (str): Directory to save results
+    """
     # Create experiment directory
     experiment_dir = os.path.join(
         results_dir,
@@ -352,7 +352,8 @@ def save_experiment_results(query_path, distances, pr_data, config, results_dir)
     
     # Get query class and prepare matches
     query_class = get_image_class(query_path)
-    matches = [(get_image_class(path), get_image_class(path)) for _, path, _ in distances]
+    # Modified this line to handle (distance, path) tuples
+    matches = [(get_image_class(path), distance) for distance, path in distances]
     
     # Calculate metrics
     ap = calculate_ap(pr_data)
@@ -360,15 +361,25 @@ def save_experiment_results(query_path, distances, pr_data, config, results_dir)
     # Save visualizations
     save_match_visualization(query_path, distances, config, experiment_dir)
     save_pr_curve(pr_data, config, experiment_dir)
-    confusion_data = save_confusion_matrix(matches, query_class, experiment_dir)
+    conf_matrix, classes = save_confusion_matrix(distances, query_class, experiment_dir)
     
     # Save analysis report
-    save_analysis_report(query_path, distances, config, ap, confusion_data, experiment_dir)
+    save_analysis_report(query_path, distances, config, ap, (conf_matrix, classes), experiment_dir)
 
 def save_analysis_report(query_path, distances, config, ap, confusion_data, save_dir):
-    """Save detailed analysis report including retrieval distribution insights."""
+    """
+    Save detailed analysis report including retrieval distribution insights.
+    
+    Args:
+        query_path (str): Path to query image
+        distances (list): List of (distance, path) tuples
+        config (dict): Configuration dictionary
+        ap (float): Average precision
+        confusion_data (tuple): (confusion_matrix_row, class_names)
+        save_dir (str): Directory to save report
+    """
     query_class = get_image_class(query_path)
-    distribution, classes = confusion_data
+    conf_matrix_row, classes = confusion_data
     
     with open(os.path.join(save_dir, 'analysis.txt'), 'w') as f:
         f.write(f"Analysis Report for Query Image: {os.path.basename(query_path)}\n")
@@ -386,9 +397,9 @@ def save_analysis_report(query_path, distances, config, ap, confusion_data, save
         f.write(f"Average Precision: {ap:.4f}\n")
         
         # Top-N accuracy
-        top_10_correct = sum(1 for _, path, _ in distances[:10] 
+        top_10_correct = sum(1 for _, path in distances[:10] 
                            if get_image_class(path) == query_class)
-        top_20_correct = sum(1 for _, path, _ in distances[:20] 
+        top_20_correct = sum(1 for _, path in distances[:20] 
                            if get_image_class(path) == query_class)
         
         f.write(f"Precision@10: {top_10_correct/10:.3f}\n")
@@ -400,19 +411,23 @@ def save_analysis_report(query_path, distances, config, ap, confusion_data, save
         # Find query class in distribution
         try:
             query_idx = classes.index(query_class)
-            correct_retrievals = int(distribution[0, query_idx])
+            correct_retrievals = int(conf_matrix_row[0, query_idx])  # Updated to use row index 0
             f.write(f"Correct retrievals (same class): {correct_retrievals}\n")
         except ValueError:
-            f.write("Query class not found in top 20 retrievals\n")
+            f.write("Query class not found in confusion matrix classes\n")
         
         # Find most retrieved classes
-        class_counts = [(cls, int(distribution[0, i])) for i, cls in enumerate(classes)]
+        class_counts = []
+        for i, cls in enumerate(classes):
+            count = int(conf_matrix_row[0, i])  # Updated to use row index 0
+            if count > 0:
+                class_counts.append((cls, count))
+        
         class_counts.sort(key=lambda x: x[1], reverse=True)
         
         f.write("\nMost retrieved classes:\n")
         for cls, count in class_counts[:3]:  # Top 3 most retrieved
-            if count > 0:  # Only show classes that were actually retrieved
-                f.write(f"- {cls}: {count} instances\n")
+            f.write(f"- {cls}: {count} instances\n")
         
         # Distance analysis
         f.write("\nDistance Analysis:\n")
